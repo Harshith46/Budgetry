@@ -1,0 +1,14 @@
+{
+  "name": "Budgetry",
+  "version": "1.0.0",
+  "description": "Budgetry App",
+  "main": "script.js",
+  "scripts": {
+    "start": "lite-server"
+  },
+  "author": "Harshith",
+  "license": "ISC",
+  "devDependencies": {
+    "lite-server": "^2.5.4"
+  }
+}
