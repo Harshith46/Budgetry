@@ -1,1 +1,2 @@
 # Budgetry
+Budget calculator
