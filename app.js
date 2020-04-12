@@ -58,6 +58,14 @@ const BudgetController = (() => {
         percentage: data.percentage,
       };
     },
+    editBudget: (type, id) => {
+      const ids = data.allItems[type].map(item => item.id);
+      const currenIndex = ids.indexOf(id);
+
+      if (currenIndex !== -1) {
+        data.allItems[type].splice(currenIndex, 1);
+      }
+    },
   };
 })();
 
@@ -71,8 +79,8 @@ const UIController = (() => {
     addListItem: (obj, type) => {
       const html =
         type === 'inc'
-          ? `<div class="item clearfix" id=${obj.id}><div class="item__description">${obj.description}</div><div class="right clearfix"><div class="item__value">+ ${obj.value}</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>`
-          : `<div class="item clearfix" id=${obj.id}><div class="item__description">${obj.description}</div><div class="right clearfix"><div class="item__value">- ${obj.value}</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>`;
+          ? `<div class="item clearfix" id=inc-${obj.id}><div class="item__description">${obj.description}</div><div class="right clearfix"><div class="item__value">+ ${obj.value}</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>`
+          : `<div class="item clearfix" id=exp-${obj.id}><div class="item__description">${obj.description}</div><div class="right clearfix"><div class="item__value">- ${obj.value}</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>`;
 
       const listElement =
         type === 'inc'
@@ -104,6 +112,10 @@ const UIController = (() => {
       document.querySelector('.budget__expenses--percentage').textContent =
         obj.percentage + ' %';
     },
+    deletelistItem: id => {
+      const el = document.getElementById(id);
+      el.parentNode.removeChild(el);
+    },
   };
 })();
 
@@ -115,6 +127,9 @@ const Controller = ((BudgetController, UIController) => {
     document.addEventListener('keypress', e => {
       e.keyCode === 13 && controlAddItem();
     });
+    document
+      .querySelector('.container')
+      .addEventListener('click', controlDeleteItem);
   };
   const UpdateBudget = () => {
     BudgetController.calculate();
@@ -133,6 +148,17 @@ const Controller = ((BudgetController, UIController) => {
       UpdateBudget();
       UIController.clearValue();
     }
+  };
+
+  const controlDeleteItem = () => {
+    const itemId = event.target.parentNode.parentNode.parentNode.parentNode.id;
+    const splitId = itemId && itemId.split('-');
+    const type = splitId && splitId[0];
+    const id = splitId && parseInt(splitId[1]);
+
+    BudgetController.editBudget(type, id);
+    UIController.deletelistItem(itemId);
+    UpdateBudget();
   };
 
   return {
