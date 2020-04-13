@@ -3,12 +3,15 @@ const BudgetController = (() => {
     this.id = id;
     this.description = description;
     this.value = value;
+    this.percentage = 0;
   };
+
   const Income = function(id, description, value) {
     this.id = id;
     this.description = description;
     this.value = value;
   };
+
   const data = {
     allItems: {
       exp: [],
@@ -38,10 +41,11 @@ const BudgetController = (() => {
       const newItem =
         type === 'inc'
           ? new Income(id, description, value)
-          : new Expense(id, description, value);
-      data.allItems[type].push(newItem);
+          : new Expense(id, description, value); //8. create respective object
+      data.allItems[type].push(newItem); //9. store respective object in repective array
       return newItem;
     },
+
     calculate: () => {
       calculateTotal('inc');
       calculateTotal('exp');
@@ -50,6 +54,7 @@ const BudgetController = (() => {
         data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
       }
     },
+
     getBudget: () => {
       return {
         budget: data.budget,
@@ -58,6 +63,7 @@ const BudgetController = (() => {
         percentage: data.percentage,
       };
     },
+
     editBudget: (type, id) => {
       const ids = data.allItems[type].map(item => item.id);
       const currenIndex = ids.indexOf(id);
@@ -72,10 +78,12 @@ const BudgetController = (() => {
 const UIController = (() => {
   return {
     getInput: () => ({
+      // 6. return an object based on inputs
       type: document.querySelector('.add__type').value,
       description: document.querySelector('.add__description').value,
       value: parseFloat(document.querySelector('.add__value').value),
     }),
+
     addListItem: (obj, type) => {
       const html =
         type === 'inc'
@@ -89,6 +97,7 @@ const UIController = (() => {
 
       listElement.insertAdjacentHTML('beforeend', html);
     },
+
     clearValue: () => {
       const getValueElements = document.querySelectorAll(
         '.add__description, .add__value'
@@ -96,6 +105,7 @@ const UIController = (() => {
       getValueElements.forEach(item => (item.value = ''));
       getValueElements[0].focus();
     },
+
     getBudget: obj => {
       const TotalBudget = () => {
         if (obj.income === obj.expense || !obj.budget) {
@@ -112,6 +122,7 @@ const UIController = (() => {
       document.querySelector('.budget__expenses--percentage').textContent =
         obj.percentage + ' %';
     },
+
     deletelistItem: id => {
       const el = document.getElementById(id);
       el.parentNode.removeChild(el);
@@ -123,26 +134,29 @@ const Controller = ((BudgetController, UIController) => {
   const getEventListeners = () => {
     document
       .querySelector('.add__btn')
-      .addEventListener('click', controlAddItem);
+      .addEventListener('click', controlAddItem); //4. callback to func onclick
     document.addEventListener('keypress', e => {
-      e.keyCode === 13 && controlAddItem();
+      // 3. assign event listener for enter and button
+      e.keyCode === 13 && controlAddItem(); //4. callback to func onclick
     });
     document
       .querySelector('.container')
       .addEventListener('click', controlDeleteItem);
   };
+
   const UpdateBudget = () => {
     BudgetController.calculate();
     UIController.getBudget(BudgetController.getBudget());
   };
+
   const controlAddItem = () => {
-    const inputValue = UIController.getInput(); //get input value
+    const inputValue = UIController.getInput(); //5. get input value
     if (inputValue.value && inputValue.description) {
       const updateDataStructure = BudgetController.addItem(
         inputValue.type,
         inputValue.description,
         inputValue.value
-      );
+      ); //7. store the inputValue in the respective array
 
       UIController.addListItem(updateDataStructure, inputValue.type);
       UpdateBudget();
@@ -163,9 +177,9 @@ const Controller = ((BudgetController, UIController) => {
 
   return {
     init: () => {
-      getEventListeners();
+      getEventListeners(); //2. call event listeners
     },
   };
 })(BudgetController, UIController);
 
-Controller.init();
+Controller.init(); // 1. app.js innvocation
